@@ -12,7 +12,7 @@ using Analyzer
 @analyze sum([1,2,3])
 ```
 
-See the docs for more details.
+See `?analyze` for more details.
 
 ## TODO
 
