@@ -309,16 +309,6 @@ _analyze(f::Function, typs::Type) = analyze(f, tuple(typs.parameters...))
   end
 end
 
-# TODO distinguish better between static and dynamic calls
-# invoke with non-leaf types may be dynamic?
-# call with leaf types may be static? 
-
-# STATUS 
-# doesn't warn on dynamic calls
-# unsure whether foo(Type{T} where T) is dynamic or underspecialized 
-# relatedly, doesn't seem to handle specialization on functions - eg sum([1,2,3])
-# doesn't show calls to builtins
-
 export analyze, @analyze
 
 end 
