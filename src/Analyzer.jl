@@ -22,11 +22,6 @@ function get_code_info(method_instance::Core.MethodInstance) ::Tuple{CodeInfo, T
   (code_info, return_typ)
 end
 
-# TODO in 0.7, should this be `isdispatchtuple`?
-function is_safe_type(typ::Type)
-  isleaftype(typ) && (typ != Core.Box)
-end
-
 "Does this expression never have a real type?"
 function is_untypeable(expr::Expr)
   expr.head in [:(=), :line, :boundscheck, :gotoifnot, :return, :meta, :inbounds, :throw, :simdloop] || (expr.head == :call && expr.args[1] == :throw)
@@ -51,6 +46,17 @@ function should_ignore(expr::Expr)
   is_error_path(expr.head) || 
   (expr.head == :call && is_error_path(expr.args[1])) ||
   (expr.head == :invoke && is_error_path(expr.args[1]))
+end
+
+function is_builtin_or_intrinsic(expr::GlobalRef)
+  fun = getfield(expr.mod, expr.name) 
+  fun isa Core.Builtin || fun isa Core.IntrinsicFunction
+end
+
+is_builtin_or_intrinsic(other) = false
+
+function is_dynamic_call(expr::Expr)
+  expr.head == :call && !is_builtin_or_intrinsic(expr.args[1])
 end
 
 @enum WarningKind NotConcretelyTyped Boxed DynamicCall
@@ -91,12 +97,8 @@ function warn!(expr::Expr, warnings::Vector{Warning})
   # many Exprs always have type Any
   if !(expr.head in [:(=), :line, :boundscheck, :gotoifnot, :return, :meta, :inbounds]) && !(expr.head == :call && expr.args[1] == :throw) 
     warn_type!(expr, expr.typ, warnings)
-    if expr.head == :call
-      # TODO logic for checking dynamic calls is tricky
-      # should check that type of arg[1] is known eg GlobalRef
-      # if any((arg) -> !is_safe_type(arg.typ), expr.args[2:end])
-      #   push!(warnings, Warning(DynamicCall, expr))
-      # end
+    if is_dynamic_call(expr)
+      push!(warnings, Warning(DynamicCall, expr))
     end
   end
 end
