@@ -309,7 +309,7 @@ _analyze(f::Function, typs::Type) = analyze(f, tuple(typs.parameters...))
   
   macro analyze(filter, ex0)
     expr = Base.gen_call_with_extracted_types($(Expr(:quote, :_analyze)), ex0)
-    insert!(expr.args, 0, esc(filter))
+    insert!(expr.args, 2, esc(filter))
     expr
   end
 end
