@@ -16,10 +16,6 @@ See `?analyze` for more details.
 
 ## TODO
 
-* doesn't warn on dynamic calls
-* unsure whether foo(Type{T} where T) is dynamic or underspecialized 
-* relatedly, doesn't seem to handle specialization on functions - eg sum([1,2,3])
-* doesn't show calls to builtins
-* distinguish better between static and dynamic calls
-* invoke with non-leaf types may be dynamic?
-* call with leaf types may be static? 
+* Point out heap allocations
+* Allow asserting type-stable / allocation-free for tests
+* Figure out interactive UX rather than just dumping a wall of text
