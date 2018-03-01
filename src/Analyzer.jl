@@ -275,10 +275,10 @@ function analyze(filter::Function, f::Function, typs::NTuple{N, Type}) where {N}
       for warning in warnings.warnings
         print("  "); print(pretty(warnings.code_info, warning)); println();
       end
-      if !isempty(warnings.warnings)
-        code_info, return_typ = get_code_info(call_node.call)
-        println(pretty(code_info, return_typ))
-      end
+      # if !isempty(warnings.warnings)
+      #   code_info, return_typ = get_code_info(call_node.call)
+      #   println(pretty(code_info, return_typ))
+      # end
     end
   end
 end
