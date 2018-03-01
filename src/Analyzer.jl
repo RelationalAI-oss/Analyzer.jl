@@ -29,20 +29,24 @@ end
 
 "Does this expression never have a real type?"
 function is_untypeable(expr::Expr)
-  expr.head in [:(=), :line, :boundscheck, :gotoifnot, :return, :meta, :inbounds, :throw] || (expr.head == :call && expr.args[1] == :throw)
+  expr.head in [:(=), :line, :boundscheck, :gotoifnot, :return, :meta, :inbounds, :throw, :simdloop] || (expr.head == :call && expr.args[1] == :throw)
 end
 
-"Does this look like error reporting code ie not worth analyzing?"
+is_untypeable(other) = true
+
+"Does this look like error reporting code ie not worth looking inside?"
 function is_error_path(expr)
   expr == :throw ||
   expr == :throw_boundserror || 
   expr == :error ||
   expr == :assert || 
+  (expr isa QuoteNode && is_error_path(expr.value)) || 
+  (expr isa Expr && expr.head == :(.) && is_error_path(expr.args[2])) ||
   (expr isa GlobalRef && is_error_path(expr.name)) ||
   (expr isa Core.MethodInstance && is_error_path(expr.def.name))
 end
 
-"Is it pointless to analyze this expression?"
+"Is it pointless to look inside this expression?"
 function should_ignore(expr::Expr)
   is_error_path(expr.head) || 
   (expr.head == :call && is_error_path(expr.args[1])) ||
@@ -70,7 +74,7 @@ struct Warnings
 end
 
 function warn_type!(location::Location, typ::Type, warnings::Vector{Warning})
-  if !isleaftype(typ)
+  if !isleaftype(typ) && !is_untypeable(location)
     push!(warnings, Warning(NotConcretelyTyped, location))
   end
   
