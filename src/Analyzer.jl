@@ -15,7 +15,7 @@ end
 function get_code_info(method_instance::Core.MethodInstance) ::Tuple{CodeInfo, Type}
   world = ccall(:jl_get_world_counter, UInt, ())
   # TODO inlining=false would make analysis easier to follow, but it seems to break specialization on function types
-  params = Core.Inference.InferenceParams(world, inlining=true)
+  params = Core.Inference.InferenceParams(world)
   optimize = true 
   cache = false # not sure if cached copies use the same params
   (_, code_info, return_typ) = Core.Inference.typeinf_code(method_instance, optimize, cache, params)
