@@ -1,6 +1,6 @@
 # Analyzer
 
-__Not yet working enough to be useful!__
+__Possibly useful!__
 
 Statically analyze Julia code for performance problems. 
 
