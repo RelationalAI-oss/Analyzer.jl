@@ -7,7 +7,7 @@ Statically analyze Julia code for performance problems.
 Usage:
 
 ``` julia
-Pkg.clone("git@github.com:RelationalAI/Analyzer.jl.git")
+Pkg.clone("git@github.com:RelationalAI-oss/Analyzer.jl.git")
 using Analyzer
 @analyze sum([1,2,3])
 ```
